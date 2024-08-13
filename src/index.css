@@ -1,3 +1,35 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .border-shadow {
+    @apply shadow-md border rounded-md border-gray-300;
+  }
+
+  .btn-primary {
+    @apply bg-orange-500 text-white p-2 rounded-lg hover:brightness-75;
+  }
+
+  .btn-secondary {
+    @apply border border-orange-500 text-black p-2 rounded-lg hover:bg-gray-200;
+  }
+
+  .item-dropdown {
+    @apply flex items-center gap-2 p-1 animation-color;
+  }
+}
+
+@layer utilities {
+  .flex-center {
+    @apply flex justify-center items-center;
+  }
+
+  .flex-between {
+    @apply flex justify-between items-center;
+  }
+
+  .animation-color {
+    @apply transition ease-in-out duration-300 bg-white hover:bg-blue-400;
+  }
+}
