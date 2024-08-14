@@ -2,8 +2,6 @@ import { Button, Modal } from "flowbite-react";
 import React from "react";
 
 const DeleteRowPopup = ({ open, handleClose, data, handleDelete }) => {
-//   console.log("data", data);
-
   return (
     <Modal show={open} onClose={handleClose}>
       <Modal.Header>Confirm deletion</Modal.Header>

@@ -16,11 +16,13 @@ import { MdDelete } from "react-icons/md";
 import { FaSearch, FaEdit, FaPlus } from "react-icons/fa";
 import { rowData as initialRowData } from "../constants/data";
 import DeleteRowPopup from "./DeleteRowPopup";
+import EditRowPopup from "./EditRowPopup";
 
 const TableData = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [openDeleteMultiple, setOpenDeleteMultiple] = useState(false);
   const [listDeletedName, setListDeletedName] = useState([]);
 
@@ -68,13 +70,12 @@ const TableData = () => {
   };
 
   const handleDeleteMultipleRows = () => {
-    // console.log('first', selectedRows);
     // setListDeletedName(selectedRows.map((index) => rowData[index].name));
     setListDeletedName(
       rowData
         .filter((row) => selectedRows.includes(row.id)) // Filter rows where the ID is in selectedRows
         .map((row) => row.name)
-    ); 
+    );
     setOpenDeleteMultiple(true);
   };
 
@@ -88,6 +89,24 @@ const TableData = () => {
     setFilteredRows(updatedRow);
     setSelectedRows([]);
     setOpenDeleteMultiple(false);
+  };
+
+  // Edit row
+  const handleEditRow = (row) => {
+    console.log("select", row);
+    setCurrentRowData(row);
+    setOpenEdit(true);
+  };
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+
+  const handleSaveEditRow = (updatedRow) => {
+    const updatedData = rowData.map((row) =>
+      row.id === updatedRow.id ? updatedRow : row
+    );
+    setRowData(updatedData);
   };
 
   // Search
@@ -127,6 +146,7 @@ const TableData = () => {
             className="bg-red-500"
             color="failure"
             onClick={handleDeleteMultipleRows}
+            disabled={selectedRows.length === 0}
           >
             <div className="flex-center gap-2">
               <MdDelete className="w-6 h-6" />
@@ -172,7 +192,10 @@ const TableData = () => {
               <TableCell>{row.email}</TableCell>
               <TableCell>{row.status}</TableCell>
               <TableCell className="flex gap-2">
-                <Button className="bg-blue-500">
+                <Button
+                  className="bg-blue-500"
+                  onClick={() => handleEditRow(row)}
+                >
                   <FaEdit className="w-4 h-4" />
                 </Button>
                 <Button
@@ -206,7 +229,7 @@ const TableData = () => {
               Do you want to delete
               <span className="text-red-500">
                 {" "}
-                {listDeletedName ? listDeletedName.join(", ") : "these data"} ?
+                {listDeletedName ? listDeletedName.join(", ") : "these data"}?
               </span>
             </p>
           </div>
@@ -225,6 +248,13 @@ const TableData = () => {
         handleClose={handleCloseDelete}
         data={currentRowData}
         handleDelete={handleConfirmDelete}
+      />
+
+      <EditRowPopup
+        open={openEdit}
+        handleClose={handleCloseEdit}
+        data={currentRowData}
+        handleSave={handleSaveEditRow}
       />
     </div>
   );
