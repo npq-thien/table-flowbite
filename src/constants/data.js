@@ -4,4 +4,5 @@ export const rowData = [
     { id: 3, name: 'Alice Johnson', age: 25, gender: 'Female', email: 'alice.johnson@example.com', status: 'Active' },
     { id: 4, name: 'Bob Brown', age: 30, gender: 'Male', email: 'bob.brown@example.com', status: 'Pending' },
     { id: 5, name: 'Charlie White', age: 40, gender: 'Male', email: 'charlie.white@example.com', status: 'Active' },
+    { id: 6, name: 'Gardek Wilson', age: 25, gender: 'Male', email: 'wilsone.Gardek@example.com', status: 'Inactive' },
   ];

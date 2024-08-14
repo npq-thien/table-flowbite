@@ -1,5 +1,5 @@
-import './index.css'
-import TableData from './TableData';
+import { TableData } from "./components";
+import "./index.css";
 
 function App() {
   return (
@@ -10,4 +10,3 @@ function App() {
 }
 
 export default App;
-
