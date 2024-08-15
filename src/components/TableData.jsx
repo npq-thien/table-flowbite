@@ -89,11 +89,12 @@ const TableData = () => {
     setFilteredRows(updatedRow);
     setSelectedRows([]);
     setOpenDeleteMultiple(false);
+    // console.log('delete multi', rowData.length, filteredRows.length)
   };
 
   // Edit row
   const handleEditRow = (row) => {
-    console.log("select", row);
+    // console.log("select", row);
     setCurrentRowData(row);
     setOpenEdit(true);
   };
@@ -107,6 +108,7 @@ const TableData = () => {
       row.id === updatedRow.id ? updatedRow : row
     );
     setRowData(updatedData);
+    setFilteredRows(updatedData);
   };
 
   // Search
@@ -187,7 +189,7 @@ const TableData = () => {
                 {row.id}
               </TableCell>
               <TableCell>{row.name}</TableCell>
-              <TableCell>{row.age}</TableCell>
+              <TableCell>{Number(row.age)}</TableCell>
               <TableCell>{row.gender}</TableCell>
               <TableCell>{row.email}</TableCell>
               <TableCell>{row.status}</TableCell>
