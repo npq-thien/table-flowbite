@@ -10,6 +10,8 @@ import {
   TableHeadCell,
   TableRow,
   TextInput,
+  Toast,
+  ToastToggle,
 } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
@@ -27,6 +29,7 @@ import {
   customPaginationTheme,
   customTableTheme,
 } from "../constants/customTheme";
+import { HiCheck } from "react-icons/hi";
 
 const columns = [
   {
@@ -218,163 +221,172 @@ const TableData = () => {
   };
 
   return (
-    <div className="p-4 overflow-x-auto">
-      <div className="flex justify-between items-center my-4">
-        <TextInput
-          type="text"
-          placeholder="Search"
-          icon={FaSearch}
-          onChange={handleSearchValue}
-          // required
-        />
-        <div className="flex items-center gap-2">
-          <Button
-            className="bg-green-400"
-            color="success"
-            onClick={handleAddRow}
-          >
-            <div className="flex-center gap-2">
-              <FaPlus className="w-6 h-6" />
-              Add row
-            </div>
-          </Button>
-          <Button
-            className="bg-red-500"
-            color="failure"
-            onClick={handleDeleteMultipleRows}
-            disabled={selectedRows.length === 0}
-          >
-            <div className="flex-center gap-2">
-              <MdDelete className="w-6 h-6" />
-              Delete rows
-            </div>
-          </Button>
-        </div>
-      </div>
-
-      <Table
-        theme={customTableTheme}
-        striped={true}
-        hoverable={true}
-        className="shadow-md w-full"
-        color="#365486"
-      >
-        <TableHead>
-          <Table.HeadCell>
-            <Checkbox
-              className="cursor-pointer"
-              onChange={handleSelectAllRows}
-              checked={selectedRows.length === rowData.length}
-            />
-          </Table.HeadCell>
-          {columns.map((item) => {
-            // console.log("asda", sortProps);
-            return (
-              <TableHeadCell key={item.key}>
-                <div
-                  className="flex items-center gap-4 cursor-pointer"
-                  onClick={() => handleSortData(item.key)}
-                >
-                  {item.label}
-                  {sortProps.column === item.key &&
-                    sortProps.direction === "desc" && <FaArrowDown />}
-                  {sortProps.column === item.key &&
-                    sortProps.direction === "asc" && <FaArrowUp />}
-                </div>
-              </TableHeadCell>
-            );
-          })}
-          <TableHeadCell>Actions</TableHeadCell>
-        </TableHead>
-        <TableBody className="divide-y">
-          {paginationRows.map((row) => (
-            <TableRow
-              key={row.id}
-              className="bg-white"
-              onDoubleClick={() => handleEditRow(row)}
-            >
-              <TableCell>
-                <Checkbox
-                  className="cursor-pointer"
-                  onChange={() => handleSelectRow(row.id)}
-                  checked={selectedRows.includes(row.id)}
-                />
-              </TableCell>
-              <TableCell className="whitespace-nowrap font-medium text-gray-900">
-                {row.id}
-              </TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.age}</TableCell>
-              <TableCell>{row.gender}</TableCell>
-              <TableCell>{row.email}</TableCell>
-              <TableCell>{row.status}</TableCell>
-              <TableCell className="flex gap-2">
-                <Button
-                  className="bg-blue-500"
-                  onClick={() => handleEditRow(row)}
-                >
-                  <FaEdit className="w-4 h-4" />
-                </Button>
-                <Button
-                  className="bg-red-400"
-                  onClick={() => handleDeleteRow(row.id)}
-                >
-                  <MdDelete className="w-4 h-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      {/* Pagination */}
-      <div className="flex flex-col gap-2 items-end mt-4">
-        <p>{filteredRows.length} items</p>
-        <Pagination
-          theme={customPaginationTheme}
-          showIcons
-          currentPage={currentPage}
-          totalPages={Math.ceil(filteredRows.length / itemsPerPage)}
-          onPageChange={onPageChange}
-        />
-      </div>
-
-      {/* Popup confirm delete multiple rows */}
-      <Modal show={openDeleteMultiple} onClose={handleCloseDeleteMultiple}>
-        <Modal.Header>Confirm deletion</Modal.Header>
-        <Modal.Body>
-          <div className="space-y-6">
-            <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-              Do you want to delete
-              <span className="text-red-500">
-                {" "}
-                {listDeletedName ? listDeletedName.join(", ") : "these data"}?
-              </span>
-            </p>
+    <div>
+      <div className="p-4 overflow-x-auto">
+        <Toast className="absolute right-0 z-10">
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
+            <HiCheck className="h-5 w-5" />
           </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={handleConfirmDeleteMultipleRows}>Accept</Button>
-          <Button color="gray" onClick={handleCloseDeleteMultiple}>
-            Cancel
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          <div className="ml-3 text-sm font-normal">Set yourself free.</div>
+          <ToastToggle />
+        </Toast>
+        <div className="flex justify-between items-center my-4">
+          <TextInput
+            type="text"
+            placeholder="Search"
+            icon={FaSearch}
+            onChange={handleSearchValue}
+            // required
+          />
+          <div className="flex items-center gap-2">
+            <Button
+              className="bg-green-400"
+              color="success"
+              onClick={handleAddRow}
+            >
+              <div className="flex-center gap-2">
+                <FaPlus className="w-6 h-6" />
+                Add row
+              </div>
+            </Button>
+            <Button
+              className="bg-red-500"
+              color="failure"
+              onClick={handleDeleteMultipleRows}
+              disabled={selectedRows.length === 0}
+            >
+              <div className="flex-center gap-2">
+                <MdDelete className="w-6 h-6" />
+                Delete rows
+              </div>
+            </Button>
+          </div>
+        </div>
 
-      {/* Delete confirm popup */}
-      <DeleteRowPopup
-        open={openDelete}
-        handleClose={handleCloseDelete}
-        data={currentRowData}
-        handleDelete={handleConfirmDelete}
-      />
+        <Table
+          theme={customTableTheme}
+          striped={true}
+          hoverable={true}
+          className="shadow-md w-full"
+          color="#365486"
+        >
+          <TableHead>
+            <Table.HeadCell>
+              <Checkbox
+                className="cursor-pointer"
+                onChange={handleSelectAllRows}
+                checked={selectedRows.length === rowData.length}
+              />
+            </Table.HeadCell>
+            {columns.map((item) => {
+              // console.log("asda", sortProps);
+              return (
+                <TableHeadCell key={item.key}>
+                  <div
+                    className="flex items-center gap-4 cursor-pointer"
+                    onClick={() => handleSortData(item.key)}
+                  >
+                    {item.label}
+                    {sortProps.column === item.key &&
+                      sortProps.direction === "desc" && <FaArrowDown />}
+                    {sortProps.column === item.key &&
+                      sortProps.direction === "asc" && <FaArrowUp />}
+                  </div>
+                </TableHeadCell>
+              );
+            })}
+            <TableHeadCell>Actions</TableHeadCell>
+          </TableHead>
+          <TableBody className="divide-y">
+            {paginationRows.map((row) => (
+              <TableRow
+                key={row.id}
+                className="bg-white"
+                onDoubleClick={() => handleEditRow(row)}
+              >
+                <TableCell>
+                  <Checkbox
+                    className="cursor-pointer"
+                    onChange={() => handleSelectRow(row.id)}
+                    checked={selectedRows.includes(row.id)}
+                  />
+                </TableCell>
+                <TableCell className="whitespace-nowrap font-medium text-gray-900">
+                  {row.id}
+                </TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.age}</TableCell>
+                <TableCell>{row.gender}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.status}</TableCell>
+                <TableCell className="flex gap-2">
+                  <Button
+                    className="bg-blue-500"
+                    onClick={() => handleEditRow(row)}
+                  >
+                    <FaEdit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    className="bg-red-400"
+                    onClick={() => handleDeleteRow(row.id)}
+                  >
+                    <MdDelete className="w-4 h-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-      <EditRowPopup
-        open={openEdit}
-        handleClose={handleCloseEdit}
-        data={currentRowData}
-        handleSave={handleSaveEditRow}
-      />
+        {/* Pagination */}
+        <div className="flex flex-col gap-2 items-end mt-4">
+          <p>{filteredRows.length} items</p>
+          <Pagination
+            theme={customPaginationTheme}
+            showIcons
+            currentPage={currentPage}
+            totalPages={Math.ceil(filteredRows.length / itemsPerPage)}
+            onPageChange={onPageChange}
+          />
+        </div>
+
+        {/* Popup confirm delete multiple rows */}
+        <Modal show={openDeleteMultiple} onClose={handleCloseDeleteMultiple}>
+          <Modal.Header>Confirm deletion</Modal.Header>
+          <Modal.Body>
+            <div className="space-y-6">
+              <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">
+                Do you want to delete
+                <span className="text-red-500">
+                  {" "}
+                  {listDeletedName ? listDeletedName.join(", ") : "these data"}?
+                </span>
+              </p>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={handleConfirmDeleteMultipleRows}>Accept</Button>
+            <Button color="gray" onClick={handleCloseDeleteMultiple}>
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Delete confirm popup */}
+        <DeleteRowPopup
+          open={openDelete}
+          handleClose={handleCloseDelete}
+          data={currentRowData}
+          handleDelete={handleConfirmDelete}
+        />
+
+        <EditRowPopup
+          open={openEdit}
+          handleClose={handleCloseEdit}
+          data={currentRowData}
+          handleSave={handleSaveEditRow}
+        />
+      </div>
     </div>
   );
 };
