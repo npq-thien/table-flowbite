@@ -13,7 +13,13 @@ import {
 } from "flowbite-react";
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
-import { FaSearch, FaEdit, FaPlus } from "react-icons/fa";
+import {
+  FaSearch,
+  FaEdit,
+  FaPlus,
+  FaArrowDown,
+  FaArrowUp,
+} from "react-icons/fa";
 import { rowData as initialRowData } from "../constants/data";
 import DeleteRowPopup from "./DeleteRowPopup";
 import EditRowPopup from "./EditRowPopup";
@@ -21,6 +27,33 @@ import {
   customPaginationTheme,
   customTableTheme,
 } from "../constants/customTheme";
+
+const columns = [
+  {
+    key: "id",
+    label: "Id",
+  },
+  {
+    key: "name",
+    label: "Name",
+  },
+  {
+    key: "age",
+    label: "Age",
+  },
+  {
+    key: "gender",
+    label: "Gender",
+  },
+  {
+    key: "email",
+    label: "Email",
+  },
+  {
+    key: "status",
+    label: "Status",
+  },
+];
 
 const TableData = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -36,6 +69,10 @@ const TableData = () => {
   const [rowData, setRowData] = useState(initialRowData);
   const [filteredRows, setFilteredRows] = useState(rowData); // this state for search, sort, filter
   const [paginationRows, setPaginationRows] = useState(filteredRows); // for pagination, depends on filtered row
+  const [sortProps, setSortProps] = useState({
+    direction: null,
+    column: null,
+  });
 
   // Pagination
   const onPageChange = (page) => setCurrentPage(page);
@@ -97,7 +134,6 @@ const TableData = () => {
   };
 
   const handleDeleteMultipleRows = () => {
-    // setListDeletedName(selectedRows.map((index) => rowData[index].name));
     setListDeletedName(
       rowData
         .filter((row) => selectedRows.includes(row.id)) // Filter rows where the ID is in selectedRows
@@ -161,7 +197,25 @@ const TableData = () => {
   };
 
   // Sort
-  
+  const handleSortData = (key) => {
+    let direction = "asc";
+
+    if (sortProps.column === key && sortProps.direction === "asc")
+      direction = "desc";
+    else if (sortProps.column === key && sortProps.direction === "desc")
+      direction = null;
+
+    setSortProps({ column: key, direction: direction });
+    if (direction) {
+      const sortedData = [...rowData].sort((a, b) => {
+        if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
+        if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
+        return "";
+      });
+      setRowData(sortedData);
+      // console.log("sorted", sortProps.column, direction, sortedData);
+    }
+  };
 
   return (
     <div className="p-4 overflow-x-auto">
@@ -213,12 +267,23 @@ const TableData = () => {
               checked={selectedRows.length === rowData.length}
             />
           </Table.HeadCell>
-          <TableHeadCell>ID</TableHeadCell>
-          <TableHeadCell>Name</TableHeadCell>
-          <TableHeadCell>Age</TableHeadCell>
-          <TableHeadCell>Gender</TableHeadCell>
-          <TableHeadCell>Email</TableHeadCell>
-          <TableHeadCell>Status</TableHeadCell>
+          {columns.map((item) => {
+            // console.log("asda", sortProps);
+            return (
+              <TableHeadCell key={item.key}>
+                <div
+                  className="flex items-center gap-4 cursor-pointer"
+                  onClick={() => handleSortData(item.key)}
+                >
+                  {item.label}
+                  {sortProps.column === item.key &&
+                    sortProps.direction === "desc" && <FaArrowDown />}
+                  {sortProps.column === item.key &&
+                    sortProps.direction === "asc" && <FaArrowUp />}
+                </div>
+              </TableHeadCell>
+            );
+          })}
           <TableHeadCell>Actions</TableHeadCell>
         </TableHead>
         <TableBody className="divide-y">
@@ -239,7 +304,7 @@ const TableData = () => {
                 {row.id}
               </TableCell>
               <TableCell>{row.name}</TableCell>
-              <TableCell>{Number(row.age)}</TableCell>
+              <TableCell>{row.age}</TableCell>
               <TableCell>{row.gender}</TableCell>
               <TableCell>{row.email}</TableCell>
               <TableCell>{row.status}</TableCell>
