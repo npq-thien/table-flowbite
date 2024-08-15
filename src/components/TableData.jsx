@@ -11,14 +11,19 @@ import {
   TableRow,
   TextInput,
 } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { FaSearch, FaEdit, FaPlus } from "react-icons/fa";
 import { rowData as initialRowData } from "../constants/data";
 import DeleteRowPopup from "./DeleteRowPopup";
 import EditRowPopup from "./EditRowPopup";
+import {
+  customPaginationTheme,
+  customTableTheme,
+} from "../constants/customTheme";
 
 const TableData = () => {
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRows, setSelectedRows] = useState([]);
   const [openDelete, setOpenDelete] = useState(false);
@@ -26,12 +31,34 @@ const TableData = () => {
   const [openDeleteMultiple, setOpenDeleteMultiple] = useState(false);
   const [listDeletedName, setListDeletedName] = useState([]);
 
+  const [searchValue, setSearchValue] = useState("");
   const [currentRowData, setCurrentRowData] = useState(null);
   const [rowData, setRowData] = useState(initialRowData);
   const [filteredRows, setFilteredRows] = useState(rowData); // this state for search, sort, filter
   const [paginationRows, setPaginationRows] = useState(filteredRows); // for pagination, depends on filtered row
 
+  // Pagination
   const onPageChange = (page) => setCurrentPage(page);
+
+  useEffect(() => {
+    // Search function
+    const newFilterRows = rowData.filter((row) =>
+      Object.entries(row).some(([key, field]) =>
+        field.toString().toLowerCase().includes(searchValue)
+      )
+    );
+    setFilteredRows(newFilterRows);
+
+    // Pagination
+    const paginatedRow = newFilterRows.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
+    setPaginationRows(paginatedRow);
+
+    // console.log("newFiltered", newFilterRows);
+    // console.log("paginatedRow", paginatedRow);
+  }, [rowData, currentPage, itemsPerPage, searchValue]);
 
   const handleSelectAllRows = (e) => {
     if (e.target.checked) {
@@ -111,21 +138,30 @@ const TableData = () => {
     setFilteredRows(updatedData);
   };
 
+  // Add row
+  const handleAddRow = () => {
+    const newId = Number(rowData.length) + 1;
+    const newRow = {
+      id: String(newId),
+      name: "",
+      age: "",
+      gender: "",
+      email: "",
+      status: "",
+    };
+    console.log(newId, rowData.length);
+    setRowData([newRow, ...rowData]);
+    setFilteredRows([newRow, ...rowData]);
+  };
+
   // Search
   const handleSearchValue = (e) => {
-    const value = e.target.value.toLowerCase();
-
-    if (value === "") {
-      setFilteredRows(rowData);
-    } else {
-      const searchedRows = rowData.filter((row) =>
-        Object.entries(row).some(([key, field]) =>
-          field.toString().toLowerCase().includes(value)
-        )
-      );
-      setFilteredRows(searchedRows);
-    }
+    setSearchValue(e.target.value.toLowerCase());
+    setCurrentPage(1);
   };
+
+  // Sort
+  
 
   return (
     <div className="p-4 overflow-x-auto">
@@ -138,7 +174,11 @@ const TableData = () => {
           // required
         />
         <div className="flex items-center gap-2">
-          <Button className="bg-green-400" color="success">
+          <Button
+            className="bg-green-400"
+            color="success"
+            onClick={handleAddRow}
+          >
             <div className="flex-center gap-2">
               <FaPlus className="w-6 h-6" />
               Add row
@@ -158,7 +198,13 @@ const TableData = () => {
         </div>
       </div>
 
-      <Table striped={true} hoverable={true} className="shadow-md w-full">
+      <Table
+        theme={customTableTheme}
+        striped={true}
+        hoverable={true}
+        className="shadow-md w-full"
+        color="#365486"
+      >
         <TableHead>
           <Table.HeadCell>
             <Checkbox
@@ -176,8 +222,12 @@ const TableData = () => {
           <TableHeadCell>Actions</TableHeadCell>
         </TableHead>
         <TableBody className="divide-y">
-          {filteredRows.map((row) => (
-            <TableRow key={row.id} className="bg-white">
+          {paginationRows.map((row) => (
+            <TableRow
+              key={row.id}
+              className="bg-white"
+              onDoubleClick={() => handleEditRow(row)}
+            >
               <TableCell>
                 <Checkbox
                   className="cursor-pointer"
@@ -213,11 +263,13 @@ const TableData = () => {
       </Table>
 
       {/* Pagination */}
-      <div className="flex justify-end mt-4">
+      <div className="flex flex-col gap-2 items-end mt-4">
+        <p>{filteredRows.length} items</p>
         <Pagination
+          theme={customPaginationTheme}
           showIcons
           currentPage={currentPage}
-          totalPages={Math.floor(rowData.length / 5) + 1}
+          totalPages={Math.ceil(filteredRows.length / itemsPerPage)}
           onPageChange={onPageChange}
         />
       </div>
