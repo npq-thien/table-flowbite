@@ -30,6 +30,8 @@ import {
   customTableTheme,
 } from "../constants/customTheme";
 import { HiCheck } from "react-icons/hi";
+import AutoHideToast from "./AutoHideToast";
+import EditableTableRow from "./EditableTableRow";
 
 const columns = [
   {
@@ -65,8 +67,10 @@ const TableData = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDeleteMultiple, setOpenDeleteMultiple] = useState(false);
-  const [listDeletedName, setListDeletedName] = useState([]);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
+  const [listDeletedName, setListDeletedName] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [currentRowData, setCurrentRowData] = useState(null);
   const [rowData, setRowData] = useState(initialRowData);
@@ -76,6 +80,10 @@ const TableData = () => {
     direction: null,
     column: null,
   });
+
+  const handleCloseToast = () => {
+    setShowToast(false);
+  };
 
   // Pagination
   const onPageChange = (page) => setCurrentPage(page);
@@ -121,6 +129,9 @@ const TableData = () => {
     setRowData(updatedRow);
     setFilteredRows(updatedRow);
     setOpenDelete(false);
+
+    setToastMessage("Deleted single row successfully.");
+    setShowToast(true);
   };
 
   const handleCloseDelete = () => {
@@ -155,6 +166,9 @@ const TableData = () => {
     setFilteredRows(updatedRow);
     setSelectedRows([]);
     setOpenDeleteMultiple(false);
+
+    setToastMessage("Deleted multiple rows succesfully.");
+    setShowToast(true);
     // console.log('delete multi', rowData.length, filteredRows.length)
   };
 
@@ -175,6 +189,9 @@ const TableData = () => {
     );
     setRowData(updatedData);
     setFilteredRows(updatedData);
+
+    setToastMessage("Save the edited row successfully.");
+    setShowToast(true);
   };
 
   // Add row
@@ -211,9 +228,8 @@ const TableData = () => {
     setSortProps({ column: key, direction: direction });
     if (direction) {
       const sortedData = [...rowData].sort((a, b) => {
-        if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
-        if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
-        return "";
+        if (a[key] <= b[key]) return direction === "asc" ? -1 : 1;
+        else return direction === "asc" ? 1 : -1;
       });
       setRowData(sortedData);
       // console.log("sorted", sortProps.column, direction, sortedData);
@@ -223,13 +239,11 @@ const TableData = () => {
   return (
     <div>
       <div className="p-4 overflow-x-auto">
-        <Toast className="absolute right-0 z-10">
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-            <HiCheck className="h-5 w-5" />
-          </div>
-          <div className="ml-3 text-sm font-normal">Set yourself free.</div>
-          <ToastToggle />
-        </Toast>
+        <AutoHideToast
+          show={showToast}
+          message={toastMessage}
+          onClose={handleCloseToast}
+        />
         <div className="flex justify-between items-center my-4">
           <TextInput
             type="text"
@@ -302,23 +316,23 @@ const TableData = () => {
               <TableRow
                 key={row.id}
                 className="bg-white"
-                onDoubleClick={() => handleEditRow(row)}
+                // onDoubleClick={() => handleEditRow(row)}
               >
-                <TableCell>
+
+                {/* <TableCell>
                   <Checkbox
                     className="cursor-pointer"
                     onChange={() => handleSelectRow(row.id)}
                     checked={selectedRows.includes(row.id)}
                   />
                 </TableCell>
-                <TableCell className="whitespace-nowrap font-medium text-gray-900">
-                  {row.id}
-                </TableCell>
+                <TableCell>{row.id}</TableCell>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>{row.age}</TableCell>
                 <TableCell>{row.gender}</TableCell>
                 <TableCell>{row.email}</TableCell>
                 <TableCell>{row.status}</TableCell>
+
                 <TableCell className="flex gap-2">
                   <Button
                     className="bg-blue-500"
@@ -332,7 +346,16 @@ const TableData = () => {
                   >
                     <MdDelete className="w-4 h-4" />
                   </Button>
-                </TableCell>
+                </TableCell> */}
+
+                <EditableTableRow
+                  row={row}
+                  onSave={handleSaveEditRow}
+                  handleDeleteRow={handleDeleteRow}
+                  handleEditRow={handleEditRow}
+                  selectedRows={selectedRows}
+                  handleSelectRow={handleSelectRow}
+                />
               </TableRow>
             ))}
           </TableBody>
